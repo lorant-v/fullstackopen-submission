@@ -1,0 +1,31 @@
+### Get
+GET http://localhost:3001/api/persons
+
+### Create OK
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "name": "My name is",
+  "number": "1234"
+}
+
+### Create no name
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "number": "4444"
+}
+
+### Create no number 
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "name": "My name is"
+}
+
+
+### Delete
+DELETE http://localhost:3001/api/persons/2
