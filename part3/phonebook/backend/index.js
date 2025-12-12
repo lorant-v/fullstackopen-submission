@@ -10,7 +10,7 @@ app.use(express.static('dist'))
 
 morgan.token(
   'body',
-  (req, res) => {
+  (req, _res) => {
     if (req.method === 'POST')
       return JSON.stringify(req.body)
   }
@@ -43,7 +43,7 @@ app.delete('/api/persons/:id', (req, res, next) => {
   Person
     .findByIdAndDelete(req.params.id)
     .then(result => {
-      console.log(result);
+      console.log(result)
       res.status(204).end()
     })
     .catch(error => next(error))
@@ -72,7 +72,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     .findById(req.params.id)
     .then(person => {
       if (!person) {
-        return res.status(404).send({ error: "Person not found" })
+        return res.status(404).send({ error: 'Person not found' })
       }
 
       person.name = name
@@ -91,7 +91,7 @@ app.get('/info', (req, res, next) => {
   Person
     .countDocuments({})
     .then(count => {
-      content = `
+      const content = `
       <p>Phonebook has info for ${count} ${count === 1 ? 'person' : 'people'}</p>
       <p>${new Date()}</p>`
 
@@ -107,7 +107,7 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-  console.log(error.message);
+  console.log(error.message)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
@@ -122,5 +122,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`)
 })

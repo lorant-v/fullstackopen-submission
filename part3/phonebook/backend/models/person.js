@@ -4,13 +4,13 @@ mongoose.set('strictQuery', false)
 
 const url = process.env.MONGODB_URI
 
-console.log(`connecting to ${url}`);
+console.log(`connecting to ${url}`)
 mongoose.connect(url, { family: 4 })
   .then(result => {
-    console.log('connected to mongodb');
+    console.log('connected to mongodb')
   })
   .catch(error => {
-    console.log('error connecting to mongodb: ', error.message);
+    console.log('error connecting to mongodb: ', error.message)
   })
 
 const personSchema = new mongoose.Schema({

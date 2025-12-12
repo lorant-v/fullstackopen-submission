@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 if (process.argv.length !== 3 && process.argv.length !== 5) {
-  console.log('Usage: node mongo.js <db_password> [<name> <number>]');
+  console.log('Usage: node mongo.js <db_password> [<name> <number>]')
   process.exit(1)
 }
 
@@ -26,13 +26,13 @@ if (process.argv.length == 5) {
   })
 
   person.save().then(result => {
-    console.log('Person saved');
-    console.log(result);
+    console.log('Person saved')
+    console.log(result)
     mongoose.connection.close()
   })
 } else {
   // Display all
-  console.log('phonebook:');
+  console.log('phonebook:')
 
   Person.find({}).then(result => {
     result.forEach(person => {
