@@ -26,6 +26,20 @@ content-type: application/json
   "name": "My name is"
 }
 
+### Update OK
+PUT http://localhost:3001/api/persons/693be936b69e8ed64d4336b2
+content-type: application/json
 
-### Delete
+{
+  "name": "My name is",
+  "number": "111-666"
+}
+
+### Delete malformed id
 DELETE http://localhost:3001/api/persons/2
+
+### Delete missing id
+DELETE http://localhost:3001/api/persons/693aa760c7888ed11e183c43
+
+### Delete OK id
+DELETE http://localhost:3001/api/persons/693aa760c7888ed11e183c48

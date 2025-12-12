@@ -17,83 +17,56 @@ morgan.token(
 )
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let persons = [
-  {
-    "id": "1",
-    "name": "Arto Hellas",
-    "number": "040-123456"
-  },
-  {
-    "id": "2",
-    "name": "Ada Lovelace",
-    "number": "39-44-5323523"
-  },
-  {
-    "id": "3",
-    "name": "Dan Abramov",
-    "number": "12-43-234345"
-  },
-  {
-    "id": "4",
-    "name": "Mary Poppendieck",
-    "number": "39-23-6423122"
-  }
-]
-
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
   Person
     .find({})
     .then(people => {
       res.json(people)
     })
+    .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = req.params.id
-
+app.get('/api/persons/:id', (req, res, next) => {
   Person
     .findById(req.params.id)
     .then(person => {
-      response.json(person)
+      if (person) {
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
     })
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = req.params.id
-
-  persons = persons.filter(p => p.id !== id)
-
-  res.status(204).end()
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person
+    .findByIdAndDelete(req.params.id)
+    .then(result => {
+      console.log(result);
+      res.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
+app.post('/api/persons', (req, res, next) => {
+  const { name, number } = req.body
 
-const generateId = () => {
-  function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
-  const MAX_ID = 1_000_000
-
-  return getRandomInt(MAX_ID)
-}
-
-app.post('/api/persons', (req, res) => {
-  const body = req.body
-
-  if (!body.name) {
+  if (!name) {
     return res.status(400).json({
       error: "Name missing"
     })
   }
 
-  if (!body.number) {
+  if (!number) {
     return res.status(400).json({
       error: "Number missing"
     })
   }
 
   const person = new Person({
-    name: body.name,
-    number: body.number,
+    name: name,
+    number: number,
   })
 
   person
@@ -101,17 +74,75 @@ app.post('/api/persons', (req, res) => {
     .then(savedPerson => {
       res.json(savedPerson)
     })
+    .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
-  content = `
-  <p>Phonebook has info for ${persons.length} people</p>
-  <p>${new Date()}</p>`
+app.put('/api/persons/:id', (req, res, next) => {
+  const { name, number } = req.body
 
-  res.send(content)
+  if (!name) {
+    return res.status(400).json({
+      error: "Name missing"
+    })
+  }
+
+  if (!number) {
+    return res.status(400).json({
+      error: "Number missing"
+    })
+  }
+
+  Person
+    .findById(req.params.id)
+    .then(person => {
+      if (!person) {
+        return response.status(404).end()
+      }
+
+      person.name = name
+      person.number = number
+
+      return person
+        .save()
+        .then(updatedPerson => {
+          res.json(updatedPerson)
+        })
+    })
+    .catch(error => next(error))
 })
 
-const PORT = 3001
+app.get('/info', (req, res, next) => {
+  Person
+    .countDocuments({})
+    .then(count => {
+      content = `
+      <p>Phonebook has info for ${count} ${count === 1 ? 'person' : 'people'}</p>
+      <p>${new Date()}</p>`
+
+      res.send(content)
+    })
+    .catch(error => next(error))
+})
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 })
