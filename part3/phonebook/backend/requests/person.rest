@@ -7,8 +7,45 @@ content-type: application/json
 
 {
   "name": "My name is",
-  "number": "1234"
+  "number": "09-1234556"
 }
+
+### Create OK
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "name": "My name is",
+  "number": "09-12345"
+}
+
+### Create bad number (short)
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "name": "My name is",
+  "number": "1234556"
+}
+
+### Create bad number (does not match pattern)
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "name": "My name is",
+  "number": "1-22334455"
+}
+
+### Create bad number (does not match pattern)
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+  "name": "My name is",
+  "number": "10-22-334455"
+}
+
 
 ### Create no name
 POST http://localhost:3001/api/persons
@@ -18,12 +55,14 @@ content-type: application/json
   "number": "4444"
 }
 
-### Create no number 
+
+### Create short name
 POST http://localhost:3001/api/persons
 content-type: application/json
 
 {
-  "name": "My name is"
+  "name": "My",
+  "number": "1234"
 }
 
 ### Update OK
@@ -31,8 +70,8 @@ PUT http://localhost:3001/api/persons/693be936b69e8ed64d4336b2
 content-type: application/json
 
 {
-  "name": "My name is",
-  "number": "111-666"
+  "name": "My",
+  "number": "111-6667"
 }
 
 ### Delete malformed id

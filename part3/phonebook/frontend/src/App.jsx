@@ -61,11 +61,18 @@ const App = () => {
           .catch(error => {
             setNotification({
               success: false,
-              message: `Information of ${updatePerson.name} has already been removed from the server`
+              message: `Error: ${error.response.data.error}`
             })
-            setPersons(
-              persons.filter(person => person.id !== updatePerson.id)
-            )
+
+            console.log(error)
+            if (error.status === 400) {
+              // validation
+            } else if (error.status === 404) {
+              // not found
+              setPersons(
+                persons.filter(person => person.id !== updatePerson.id)
+              )
+            }
           })
       }
     } else {
