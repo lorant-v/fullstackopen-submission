@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 const app = express()
 
@@ -39,18 +41,21 @@ let persons = [
 ]
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person
+    .find({})
+    .then(people => {
+      res.json(people)
+    })
 })
 
 app.get('/api/persons/:id', (req, res) => {
   const id = req.params.id
 
-  const person = persons.find(p => p.id === id)
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404).end()
-  }
+  Person
+    .findById(req.params.id)
+    .then(person => {
+      response.json(person)
+    })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -61,13 +66,6 @@ app.delete('/api/persons/:id', (req, res) => {
   res.status(204).end()
 })
 
-app.post('/api/persons/:id', (req, res) => {
-  const id = req.params.id
-
-  persons = persons.filter(p => p.id !== id)
-
-  res.status(204).end()
-})
 
 const generateId = () => {
   function getRandomInt(max) {
@@ -79,7 +77,6 @@ const generateId = () => {
 }
 
 app.post('/api/persons', (req, res) => {
-
   const body = req.body
 
   if (!body.name) {
@@ -94,21 +91,16 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  if (persons.find(p => p.name === body.name)) {
-    return res.status(400).json({
-      error: "Name must be unique"
-    })
-  }
-
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  }
+  })
 
-  persons = persons.concat(person)
-
-  res.json(person)
+  person
+    .save()
+    .then(savedPerson => {
+      res.json(savedPerson)
+    })
 })
 
 app.get('/info', (req, res) => {

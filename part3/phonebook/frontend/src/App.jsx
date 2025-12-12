@@ -43,51 +43,28 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    const person = persons.find(p => p.name === newName)
-    if (person) {
-      if (confirm(`${person.name} is already added to phonebook, replace the old number with the new one?`)) {
-        const updatePerson = {
-          ...person,
-          number: newNumber
-        }
-
-        personsService
-          .updatePerson(updatePerson)
-          .then(updatedPerson => {
-            setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person))
-            setNotification({
-              success: true,
-              message: `Updated ${updatedPerson.name}`
-            })
-            resetNotification(3000)
-          })
-          .catch(error => {
-            setNotification({
-              success: false,
-              message: `Information of ${updatePerson.name} has already been removed from the server`
-            })
-            setPersons(
-              persons.filter(person => person.id !== updatePerson.id)
-            )
-          })
-      }
-    } else {
-      const newPerson = {
-        name: newName,
-        number: newNumber,
-      }
-
-      personsService
-        .createPerson(newPerson)
-        .then(createdPerson => {
-          setPersons(persons.concat(createdPerson))
-          setNotification({
-            success: true,
-            message: `Added ${createdPerson.name}`
-          })
-          resetNotification(3000)
-        })
+    const newPerson = {
+      name: newName,
+      number: newNumber,
     }
+
+    personsService
+      .createPerson(newPerson)
+      .then(createdPerson => {
+        setPersons(persons.concat(createdPerson))
+        setNotification({
+          success: true,
+          message: `Added ${createdPerson.name}`
+        })
+        resetNotification(3000)
+      })
+      .catch(error => {
+        setNotification({
+          success: false,
+          message: `Error: ${error.response.data.error}`
+        })
+      })
+
     setNewName('')
     setNewNumber('')
   }
