@@ -18,7 +18,7 @@ const personSchema = new mongoose.Schema({
 
 const Person = new mongoose.model('Person', personSchema)
 
-if (process.argv.length == 5) {
+if (process.argv.length === 5) {
   // Add to db
   const person = new Person({
     name: process.argv[3],

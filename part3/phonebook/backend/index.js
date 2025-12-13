@@ -10,7 +10,7 @@ app.use(express.static('dist'))
 
 morgan.token(
   'body',
-  (req, _res) => {
+  (req) => {
     if (req.method === 'POST')
       return JSON.stringify(req.body)
   }
