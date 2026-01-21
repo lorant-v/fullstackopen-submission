@@ -45,8 +45,6 @@ describe('when there is initially some blogs saved', () => {
     })
   })
 
-
-
   describe('adding a new blog', () => {
     test('succeeds when blog is valid', async () => {
       const newBlog = {
@@ -111,6 +109,60 @@ describe('when there is initially some blogs saved', () => {
         .post('/api/blogs')
         .send(newBlog)
         .expect(400)
+    })
+  })
+
+  describe('deleting a blog', () => {
+    test('succeeds with code 204 if id is valid', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const ids = blogsAtEnd.map(b => b.id)
+      assert(!ids.includes(blogToDelete.id))
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1)
+    })
+
+    test('succeeds with code 204 if blog already deleted', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const idToDelete = await helper.nonExistingId()
+
+      await api
+        .delete(`/api/blogs/${idToDelete}`)
+        .expect(204)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const ids = blogsAtEnd.map(b => b.id)
+      assert(!ids.includes(idToDelete))
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+    })
+  })
+
+  describe('updating a blog', () => {
+    test('succeeds if id is valid', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const idToUpdate = blogsAtStart[0].id
+
+      await api
+        .put(`/api/blogs/${idToUpdate}`)
+        .send({ likes: 100 })
+        .expect(200)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.filter(b => b.id === idToUpdate)[0].likes, 100)
+    })
+
+    test('fails with code 404 if id is not valid', async () => {
+      const idToUpdate = await helper.nonExistingId()
+
+      await api
+        .put(`/api/blogs/${idToUpdate}`)
+        .send({ likes: 100 })
+        .expect(404)
     })
   })
 })
