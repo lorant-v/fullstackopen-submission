@@ -1,0 +1,20 @@
+### Get all
+GET http://localhost:3001/api/notes
+
+### Get by id
+GET http://localhost:3001/api/notes/693aa038a2db8031ba1d0f58
+
+### Create new
+POST http://localhost:3001/api/notes
+content-type: application/json
+# content-type: text/plain
+
+{
+  "content": "shr",
+  "important": true
+}
+
+###
+DELETE http://localhost:3001/api/notes/693ae47211ef3b89b7d8a761
+
+###
